@@ -13,8 +13,8 @@ Using a command-line terminal/shell, execute the following (first change the pas
 
 This takes a few minutes to complete. Once completed, you should have a MongoDB Sharded Cluster initialised, secured and running in some Kubernetes StatefulSets. The executed bash script will have created the following resources:
 
-* 1x Config Server Replica Set containing 3x replicas (k8s deployment type: "StatefulSet")
-* 3x Shards with each Shard being a Replica Set containing 3x replicas (k8s deployment type: "StatefulSet")
+* 1x Config Server Replica Set containing 1x replicas (k8s deployment type: "StatefulSet")
+* 2x Shards with 1 Shard being a Replica Set containing 3x replicas and the other Shard being a Replica Set containing 1x replicas (k8s deployment type: "StatefulSet")
 * 1x Mongos Routers (k8s deployment type: "StatefulSet")
 
 You can view the list of Pods that contain these MongoDB resources, by running the following:
