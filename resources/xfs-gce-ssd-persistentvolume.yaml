@@ -8,7 +8,7 @@ spec:
   accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
-  storageClassName: fast
+  storageClassName: gluster-stor-cls-test
   gcePersistentDisk:
     fsType: xfs
     pdName: pd-ssd-disk-SIZEg-INST
