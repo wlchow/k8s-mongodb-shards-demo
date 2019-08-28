@@ -18,8 +18,9 @@ kubectl delete secret shared-bootstrap-data
 sleep 3
 
 # Delete persistent volume claims
-kubectl delete persistentvolumeclaims -l tier=maindb
-kubectl delete persistentvolumeclaims -l tier=configdb
+kubectl delete persistentvolumeclaims -l role=mongodb-shard1
+kubectl delete persistentvolumeclaims -l role=mongodb-shard2
+kubectl delete persistentvolumeclaims -l role=mongo-configdb
 sleep 3
 
 

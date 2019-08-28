@@ -1,33 +1,34 @@
+# This is a Headless Service
 apiVersion: v1
 kind: Service
 metadata:
-  name: mongos-router-service
+  name: mongodb-shard1-service
   labels:
-    name: mongos-router
+    name: mongodb-shard1
 spec:
   ports:
   - port: 27017
     targetPort: 27017
   clusterIP: None
   selector:
-    role: mongos-router
+    role: mongodb-shard1
 ---
 apiVersion: apps/v1beta1
 kind: StatefulSet
 metadata:
-  name: mongos-router
+  name: mongod-shard1
 spec:
   selector:
     matchLabels:
-      role: mongos-router
-  serviceName: mongos-router-service
-  replicas: 1
+      role: mongodb-shard1
+  serviceName: mongodb-shard1-service
+  replicas: 3
   template:
     metadata:
       labels:
-        role: mongos-router
-        tier: routers
-        replicaset: routers
+        role: mongodb-shard1
+        tier: maindb
+        replicaset: Shard1RepSet
     spec:
       affinity:
         podAntiAffinity:
@@ -39,7 +40,7 @@ spec:
                 - key: replicaset
                   operator: In
                   values:
-                  - routers
+                  - Shard1RepSet
               topologyKey: kubernetes.io/hostname
       terminationGracePeriodSeconds: 10
       volumes:
@@ -48,16 +49,20 @@ spec:
             secretName: shared-bootstrap-data
             defaultMode: 256
       containers:
-        - name: mongos-container
+        - name: mongod-shard1-container
           image: wchow/mongo-ent:4.2
           command:
-            - "mongos"
+            - "mongod"
             - "--port"
             - "27017"
+            - "--wiredTigerCacheSizeGB"
+            - "0.5"
             - "--bind_ip"
             - "0.0.0.0"
-            - "--configdb"
-            - "ConfigDBRepSet/mongod-configdb-0.mongodb-configdb-service.default.svc.cluster.local:27017"
+            - "--shardsvr"
+            - "--replSet"
+            - "Shard1RepSet"
+            - "--auth"
             - "--clusterAuthMode"
             - "keyFile"
             - "--keyFile"
@@ -67,11 +72,22 @@ spec:
           resources:
             requests:
               cpu: 0.25
-              memory: 512Mi
+              memory: 1Gi 
           ports:
             - containerPort: 27017
           volumeMounts:
             - name: secrets-volume
               readOnly: true
               mountPath: /etc/secrets-volume
-
+            - name: mongo-shard1-persistent-storage-claim
+              mountPath: /data/db
+  volumeClaimTemplates:
+  - metadata:
+      name: mongo-shard1-persistent-storage-claim
+      annotations:
+        volume.beta.kubernetes.io/storage-class: "gluster-stor-cls-test"
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 8Gi

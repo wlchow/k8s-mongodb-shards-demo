@@ -22,7 +22,7 @@ spec:
     matchLabels:
       role: mongo-configdb
   serviceName: mongodb-configdb-service
-  replicas: 3
+  replicas: 1
   template:
     metadata:
       labels:
@@ -30,6 +30,18 @@ spec:
         tier: configdb
         replicaset: ConfigDBRepSet
     spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: replicaset
+                  operator: In
+                  values:
+                  - ConfigDBRepSet
+              topologyKey: kubernetes.io/hostname
       terminationGracePeriodSeconds: 10
       volumes:
         - name: secrets-volume
@@ -44,7 +56,7 @@ spec:
             - "--port"
             - "27017"
             - "--wiredTigerCacheSizeGB"
-            - "0.5"
+            - "0.25"
             - "--bind_ip"
             - "0.0.0.0"
             - "--configsvr"
@@ -59,8 +71,8 @@ spec:
             - "authenticationMechanisms=SCRAM-SHA-1"
           resources:
             requests:
-              cpu: 1 
-              memory: 2Gi
+              cpu: 0.25
+              memory: 512Mi
           ports:
             - containerPort: 27017
           volumeMounts:
@@ -73,7 +85,7 @@ spec:
   - metadata:
       name: mongo-configdb-persistent-storage-claim
       annotations:
-        volume.beta.kubernetes.io/storage-class: "standard"
+        volume.beta.kubernetes.io/storage-class: "gluster-stor-cls-test"
     spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
