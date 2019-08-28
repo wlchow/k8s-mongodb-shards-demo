@@ -29,19 +29,6 @@ spec:
         tier: routers
         replicaset: routers
     spec:
-      affinity:
-        podAntiAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 100
-            podAffinityTerm:
-              labelSelector:
-                matchExpressions:
-                - key: replicaset
-                  operator: In
-                  values:
-                  - routers
-              topologyKey: kubernetes.io/hostname
-      terminationGracePeriodSeconds: 10
       volumes:
         - name: secrets-volume
           secret:
@@ -58,6 +45,8 @@ spec:
             - "0.0.0.0"
             - "--configdb"
             - "ConfigDBRepSet/mongod-configdb-0.mongodb-configdb-service.default.svc.cluster.local:27017"
+            - "--logpath"
+            - "/tmp/mongos.log"
             - "--clusterAuthMode"
             - "keyFile"
             - "--keyFile"

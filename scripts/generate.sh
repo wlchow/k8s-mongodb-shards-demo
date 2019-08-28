@@ -22,10 +22,6 @@ echo "Deploying k8s StatefulSet & Service for each MongoDB Shard Replica Set"
 kubectl apply -f ../resources/mongodb-maindb-shard1-service.yaml
 kubectl apply -f ../resources/mongodb-maindb-shard2-service.yaml
 
-# Deploy some Mongos Routers using a Kubernetes StatefulSet
-echo "Deploying k8s Deployment & Service for some Mongos Routers"
-kubectl apply -f ../resources/mongodb-mongos-service.yaml
-
 
 # Wait until the final mongod of each Shard + the ConfigDB has started properly
 echo
@@ -68,6 +64,10 @@ sleep 2 # Just a little more sleep to ensure everything is ready!
 echo "...initialisation of the MongoDB Replica Sets completed"
 echo
 
+# NOTE: The Mongos should be deployed AFTER the ConfigDBRepSet has been initialized otherwise it will error out with Unable to reach primary for set ConfigDBRepSet
+# Deploy some Mongos Routers using a Kubernetes StatefulSet
+echo "Deploying k8s Deployment & Service for some Mongos Routers"
+kubectl apply -f ../resources/mongodb-mongos-service.yaml
 
 # Wait for the mongos to have started properly
 echo "Waiting for the first mongos to come up (`date`)..."

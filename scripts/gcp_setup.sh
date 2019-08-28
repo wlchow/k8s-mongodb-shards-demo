@@ -25,12 +25,12 @@ echo "Creating GCE disks"
 for i in 1 2 3
 do
     # 4GB disks    
-    gcloud compute disks create --size 4GB --type pd-ssd pd-ssd-disk-4g-$i
+    gcloud compute disks create --size 4GB --type pd-ssd pd-ssd-disk-4g-$i --zone northamerica-northeast1-a
 done
 for i in 1 2 3 4 5 6 7 8 9
 do
     # 8 GB disks
-    gcloud compute disks create --size 8GB --type pd-ssd pd-ssd-disk-8g-$i
+    gcloud compute disks create --size 8GB --type pd-ssd pd-ssd-disk-8g-$i --zone northamerica-northeast1-a
 done
 sleep 3
 
