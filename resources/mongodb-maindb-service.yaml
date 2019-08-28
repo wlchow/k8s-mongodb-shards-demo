@@ -1,0 +1,81 @@
+# This is a Headless Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb-shardX-service
+  labels:
+    name: mongodb-shardX
+spec:
+  ports:
+  - port: 27017
+    targetPort: 27017
+  clusterIP: None
+  selector:
+    role: mongodb-shardX
+---
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: mongod-shardX
+spec:
+  selector:
+    matchLabels:
+      role: mongodb-shardX
+  serviceName: mongodb-shardX-service
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        role: mongodb-shardX
+        tier: maindb
+        replicaset: ShardXRepSet
+    spec:
+      terminationGracePeriodSeconds: 10
+      volumes:
+        - name: secrets-volume
+          secret:
+            secretName: shared-bootstrap-data
+            defaultMode: 256
+      containers:
+        - name: mongod-shardX-container
+          image: wchow/mongo-ent:4.2
+          command:
+            - "mongod"
+            - "--port"
+            - "27017"
+            - "--wiredTigerCacheSizeGB"
+            - "3.0"
+            - "--bind_ip"
+            - "0.0.0.0"
+            - "--shardsvr"
+            - "--replSet"
+            - "ShardXRepSet"
+            - "--auth"
+            - "--clusterAuthMode"
+            - "keyFile"
+            - "--keyFile"
+            - "/etc/secrets-volume/internal-auth-mongodb-keyfile"
+            - "--setParameter"
+            - "authenticationMechanisms=SCRAM-SHA-1"
+          resources:
+            requests:
+              cpu: 2
+              memory: 8Gi 
+          ports:
+            - containerPort: 27017
+          volumeMounts:
+            - name: secrets-volume
+              readOnly: true
+              mountPath: /etc/secrets-volume
+            - name: mongo-shardX-persistent-storage-claim
+              mountPath: /data/db
+  volumeClaimTemplates:
+  - metadata:
+      name: mongo-shardX-persistent-storage-claim
+      annotations:
+        volume.beta.kubernetes.io/storage-class: "standard"
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 10Gi
