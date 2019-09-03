@@ -30,6 +30,19 @@ spec:
         tier: configdb
         replicaset: ConfigDBRepSet
     spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: replicaset
+                  operator: In
+                  values:
+                  - ConfigDBRepSet
+              topologyKey: kubernetes.io/hostname
+      terminationGracePeriodSeconds: 10
       volumes:
         - name: secrets-volume
           secret:
