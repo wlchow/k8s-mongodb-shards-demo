@@ -1,0 +1,94 @@
+# This is a Headless Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb-configdb-service
+  labels:
+    name: mongo-configdb
+spec:
+  ports:
+  - port: 27017
+    targetPort: 27017
+  clusterIP: None
+  selector:
+    role: mongo-configdb
+---
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: mongod-configdb
+spec:
+  selector:
+    matchLabels:
+      role: mongo-configdb
+  serviceName: mongodb-configdb-service
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        role: mongo-configdb
+        tier: configdb
+        replicaset: ConfigDBRepSet
+    spec:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: replicaset
+                  operator: In
+                  values:
+                  - ConfigDBRepSet
+              topologyKey: kubernetes.io/hostname
+      terminationGracePeriodSeconds: 10
+      volumes:
+        - name: secrets-volume
+          secret:
+            secretName: shared-bootstrap-data
+            defaultMode: 256
+      containers:
+        - name: mongod-configdb-container
+          image: wchow/mongo-ent:4.2
+          command:
+            - "mongod"
+            - "--port"
+            - "27017"
+            - "--wiredTigerCacheSizeGB"
+            - "0.25"
+            - "--bind_ip"
+            - "0.0.0.0"
+            - "--configsvr"
+            - "--replSet"
+            - "ConfigDBRepSet"
+            - "--logpath"
+            - "/tmp/mongod.log"
+        #   - "--auth"
+        #   - "--clusterAuthMode"
+        #   - "keyFile"
+        #   - "--keyFile"
+        #   - "/etc/secrets-volume/internal-auth-mongodb-keyfile"
+        #   - "--setParameter"
+        #   - "authenticationMechanisms=SCRAM-SHA-1"
+          resources:
+            requests:
+              cpu: 0.25
+              memory: 512Mi
+          ports:
+            - containerPort: 27017
+          volumeMounts:
+            - name: secrets-volume
+              readOnly: true
+              mountPath: /etc/secrets-volume
+            - name: mongo-configdb-persistent-storage-claim
+              mountPath: /data/db
+  volumeClaimTemplates:
+  - metadata:
+      name: mongo-configdb-persistent-storage-claim
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: "fast"
+      resources:
+        requests:
+          storage: 4Gi
