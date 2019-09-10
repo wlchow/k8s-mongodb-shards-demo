@@ -33,8 +33,9 @@ To test that the sharded cluster is working properly, connect to the container r
     $ mongo
     > db.getSiblingDB('admin').auth("main_admin", "abc123");
     > sh.enableSharding("test");
-    > sh.shardCollection("test.testcoll", {"myfield": 1});
     > use test;
+    > db.testcoll.createIndex( { "myfield": 1});
+    > sh.shardCollection("test.testcoll", {"myfield": 1});
     > db.testcoll.insert({"myfield": "a", "otherfield": "b"});
     > db.testcoll.find();
     > sh.status();
