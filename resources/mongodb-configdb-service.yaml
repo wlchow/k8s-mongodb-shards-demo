@@ -82,7 +82,7 @@ spec:
               readOnly: true
               mountPath: /etc/secrets-volume
             - name: mongo-configdb-persistent-storage-claim
-              mountPath: /data/db
+              mountPath: /data/configdb
   volumeClaimTemplates:
   - metadata:
       name: mongo-configdb-persistent-storage-claim
