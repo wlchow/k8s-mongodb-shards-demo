@@ -82,7 +82,7 @@ spec:
               readOnly: true
               mountPath: /etc/secrets-volume
             - name: mongo-shard1-persistent-storage-claim
-              mountPath: /data
+              mountPath: /data/db
   volumeClaimTemplates:
   - metadata:
       name: mongo-shard1-persistent-storage-claim
