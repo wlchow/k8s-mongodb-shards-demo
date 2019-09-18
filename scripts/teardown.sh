@@ -23,4 +23,7 @@ kubectl delete persistentvolumeclaims -l role=mongodb-shard2
 kubectl delete persistentvolumeclaims -l role=mongo-configdb
 sleep 3
 
+# Delete persistent volume claims
+kubectl delete pv --all
+
 

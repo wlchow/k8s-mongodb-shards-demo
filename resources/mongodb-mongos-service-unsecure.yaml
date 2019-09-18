@@ -47,6 +47,8 @@ spec:
             - "ConfigDBRepSet/mongod-configdb-0.mongodb-configdb-service.default.svc.cluster.local:27017"
             - "--logpath"
             - "/tmp/mongos.log"
+              #     - "--setParameter"
+              # - "authenticationMechanisms=SCRAM-SHA-1"
        #    - "--clusterAuthMode"
        #    - "keyFile"
        #    - "--keyFile"

@@ -64,7 +64,7 @@ spec:
             - "ConfigDBRepSet"
             - "--logpath"
             - "/tmp/mongod.log"
-        #   - "--auth"
+        #    - "--auth"
         #   - "--clusterAuthMode"
         #   - "keyFile"
         #   - "--keyFile"
@@ -82,7 +82,7 @@ spec:
               readOnly: true
               mountPath: /etc/secrets-volume
             - name: mongo-configdb-persistent-storage-claim
-              mountPath: /data/configdb
+              mountPath: /data
   volumeClaimTemplates:
   - metadata:
       name: mongo-configdb-persistent-storage-claim
