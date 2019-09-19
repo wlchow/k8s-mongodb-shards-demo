@@ -77,7 +77,7 @@ spec:
             - "authenticationMechanisms=SCRAM-SHA-1"
             - "--enableEncryption"
             - "--encryptionKeyFile"
-            - "/etc/mongodb-keyfile/mongodb-encryption-keyfile"
+            - "/etc/mongodb-encrypt/mongodb-encryption-keyfile"
           resources:
             requests:
               cpu: 0.25
@@ -90,7 +90,7 @@ spec:
               mountPath: /etc/secrets-volume
             - name: mongodb-encrypt
               readOnly: true
-              mountPath: /etc/mongodb-keyfile
+              mountPath: /etc/mongodb-encrypt
             - name: mongo-shard3-persistent-storage-claim
               mountPath: /data/db
   volumeClaimTemplates:
