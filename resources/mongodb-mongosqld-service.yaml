@@ -1,0 +1,63 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongosqld-bi-service
+  labels:
+    name: mongosqld-bi
+spec:
+  ports:
+  - port: 3307
+    targetPort: 3307
+  clusterIP: None
+  selector:
+    role: mongosqld-bi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongosqld-bi-service-external
+  labels:
+    name: mongosqld-bi
+spec:
+  ports:
+  - port: 3307
+    nodePort: 32321
+  selector:
+    role: mongosqld-bi
+  type: NodePort
+---
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: mongosqld-bi
+spec:
+  selector:
+    matchLabels:
+      role: mongosqld-bi
+  serviceName: mongosqld-bi-service
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        role: mongosqld-bi
+        tier: bi 
+        replicaset: bi
+    spec:
+      containers:
+        - name: mongosqld-container
+          image: wchow/mongo-bi:2.12
+          command:
+            - "mongosqld"
+            - "--mongo-uri"
+            - "mongodb://mongos-router-0.mongos-router-service.default.svc.cluster.local:27017"
+            - "--addr"
+            - "0.0.0.0"
+            - "--logPath"
+            - "/tmp/mongosqld.log"
+          resources:
+            requests:
+              cpu: 0.25
+              memory: 512Mi
+          ports:
+            - containerPort: 3307
+
