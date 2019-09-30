@@ -19,6 +19,7 @@ kubectl delete services mongosqld-bi-service
 kubectl delete services mongosqld-bi-service-external
 kubectl delete secret shared-bootstrap-data
 kubectl delete secret mongodb-keyfile
+kubectl delete daemonset hostvm-configurer
 sleep 3
 
 # Delete persistent volume claims
@@ -28,7 +29,28 @@ kubectl delete persistentvolumeclaims -l role=mongodb-shard3
 kubectl delete persistentvolumeclaims -l role=mongo-configdb
 sleep 3
 
-# Delete persistent volume claims
-kubectl delete pv --all
+# Delete persistent volumes
+for i in 1 2 3
+do
+    kubectl delete persistentvolumes data-volume-4g-$i
+done
+for i in 1 2 3 4 5 6 7 8 9
+do
+    kubectl delete persistentvolumes data-volume-8g-$i
+done
+sleep 20
+
+# Delete GCE disks
+for i in 1 2 3
+do
+    gcloud -q compute disks delete pd-ssd-disk-4g-$i
+done
+for i in 1 2 3 4 5 6 7 8 9
+do
+    gcloud -q compute disks delete pd-ssd-disk-8g-$i
+done
+
+# Delete whole Kubernetes cluster (including its VM instances)
+gcloud -q container clusters delete "gke-mongodb-demo-cluster"
 
 
