@@ -1,10 +1,8 @@
 # k8s-mongodb-shards-demo
 
-### NOTE
-Credit goes to Paul Done. This is a modified version of Paul Done's [MongoDB Sharded Cluster Deployment
-Demo for Kubernetes on GKE](https://github.com/pkdone/gke-mongodb-shards-demo)
+An example project demonstrating the deployment of a MongoDB Sharded Cluster via Kubernetes on the Google Kubernetes Engine (GKE), using Kubernetes' feature StatefulSet. Contains example Kubernetes YAML resource files (in the 'resource' folder) and associated Kubernetes based Bash scripts (in the 'scripts' folder) to configure the environment and deploy a MongoDB Replica Set.
 
-###  Deployment
+## Deployment
 
 Using a command-line terminal/shell, execute the following (first change the password variable in the script "generate.sh", if appropriate):
 
@@ -25,7 +23,7 @@ The running mongos router will be accessible to any "app tier" containers, that 
 
     mongos-router-0.mongos-router-service.default.svc.cluster.local:27017
 
-###  Test Sharding Your Own Collection
+## Test Sharding Your Own Collection
 
 To test that the sharded cluster is working properly, connect to the container running the first "mongos" router, then use the Mongo Shell to authenticate, enable sharding on a specific collection, add some test data to this collection and then view the status of the Sharded cluster and collection:
 
@@ -40,8 +38,12 @@ To test that the sharded cluster is working properly, connect to the container r
     > db.testcoll.find();
     > sh.status();
 
-### Undeploying & Cleaning Down the Kubernetes Environment
+## Undeploying & Cleaning Down the Kubernetes Environment
 
 Run the following script to undeploy the MongoDB Services & StatefulSets plus related Kubernetes resources.
 
     $ ./teardown.sh
+
+## Acknowledgements
+Credit goes to Paul Done. This is a modified version of Paul Done's [MongoDB Sharded Cluster Deployment
+Demo for Kubernetes on GKE](https://github.com/pkdone/gke-mongodb-shards-demo)
